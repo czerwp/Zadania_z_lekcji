@@ -1,0 +1,1 @@
+print("Tym razem nie ma literowki w tytule skryptu")
