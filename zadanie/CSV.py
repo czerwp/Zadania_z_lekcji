@@ -5,8 +5,7 @@ import os
 
 def main():
     if len(sys.argv) < 3:
-        print("Błąd: Za mało argumentów.")
-        print("Użycie: python reader.py <in.csv> <out.csv> <x,y,wartosc> ...")
+        print("Błąd: Za mało argumentów. Wpis w konsoli powinien wyglądać w następujący sposób:  python .\{ścieżka w której znajduje się plik z kodem programu}\CSV.py in.csv out.csv x,y,wartość")
         return
 
     input_file = sys.argv[1]
@@ -14,9 +13,7 @@ def main():
     changes = sys.argv[3:]
 
     if not os.path.exists(input_file):
-        print(f"Błąd: Plik wejściowy '{input_file}' nie istnieje.")
-
-        print(f"Dostępne pliki: {', '.join(os.listdir('.'))}")
+        print(f"Błąd! Plik wejściowy '{input_file}' nie istnieje.")
         return
 
     data = []
@@ -25,8 +22,8 @@ def main():
             reader = csv.reader(f)
             for row in reader:
                 data.append(row)
-    except Exception as e:
-        print(f"Błąd podczas odczytu pliku: {e}")
+    except Exception as wyjatek:
+        print(f"Błąd podczas odczytu pliku: {wyjatek}")
         return
 
     for change in changes:
@@ -43,9 +40,9 @@ def main():
             if y < len(data) and x < len(data[y]):
                 data[y][x] = new_value
             else:
-                print(f"Błąd: Współrzędne {x},{y} poza zakresem pliku.")
+                print(f"Błąd, współrzędne {x},{y} poza zakresem pliku.")
         except ValueError:
-            print(f"Błąd: Współrzędne w '{change}' muszą być liczbami całkowitymi.")
+            print(f"Błąd, współrzędne w '{change}' muszą być liczbami całkowitymi.")
 
     print("\n Zawartość po modyfikacji:")
     for row in data:
