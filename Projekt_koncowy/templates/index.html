@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>SP 55 - System</title>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">SP55</div>
+        <h1>Szkoła podstawowa nr 55</h1>
+    </div>
+<div class="weather-bar">
+    <div class="weather-icon">🌡️</div>
+    <div class="weather-info">
+        {% if pogoda %}
+            <h2>Poznań: {{ pogoda.temp }}</h2>
+            <p>Opady: {{ pogoda.opady }} | Data: {{ pogoda.data }}</p>
+        {% else %}
+            <p>Pogoda chwilowo niedostępna</p>
+        {% endif %}
+    </div>
+    <div class="weather-icon">🌤️☁️</div>
+</div>
+
+    <div class="grid-forms">
+       <div class="form-card">
+            <h3>Szukaj Ucznia</h3>
+            <form action="/szukaj" method="POST" target="_blank">
+                <input type="hidden" name="typ" value="uczen">
+                <input type="text" name="fraza" placeholder="Imię i Nazwisko ucznia" required>
+                <button type="submit">Wyszukaj</button>
+            </form>
+        </div>
+
+        <div class="form-card">
+            <h3>Szukaj Nauczyciela</h3>
+            <form action="/szukaj" method="POST" target="_blank">
+                <input type="hidden" name="typ" value="nauczyciel">
+                <input type="text" name="fraza" placeholder="Imię i Nazwisko nauczyciela" required>
+                <button type="submit">Wyszukaj</button>
+            </form>
+        </div>
+
+        <div class="form-card">
+            <h3>Szukaj Klasy</h3>
+            <form action="/szukaj" method="POST" target="_blank">
+                <input type="hidden" name="typ" value="klasa">
+                <input type="text" name="fraza" placeholder="Nazwa klasy (np. 4A)" required>
+                <button type="submit">Wyszukaj</button>
+            </form>
+        </div>
+
+        <div class="form-card">
+            <h3>Zarządzanie Danymi</h3>
+            <p>Kliknij poniżej, aby dodać nowego ucznia do bazy danych.</p>
+            <button onclick="location.href='/dodaj_formularz'" class="add-btn">Otwórz formularz dodawania</button>
+        </div>
+    </div>
+</body>
+</html>

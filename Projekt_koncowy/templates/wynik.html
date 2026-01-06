@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Wyniki wyszukiwania</title>
+</head>
+<body>
+    <div class="form-card" style="max-width: 800px; margin: 40px auto;">
+        <h2>Wyniki wyszukiwania dla: "{{ fraza }}"</h2>
+        <p>Kategoria: {{ typ }}</p>
+        <hr>
+        {% if wyniki %}
+            {% for r in wyniki %}
+            <div style="border-bottom: 2px solid #e2e8f0; padding: 20px 0;">
+                <p><strong>🎓 Uczeń:</strong> {{ r.uczen }}</p>
+                <p><strong>🏫 Klasa:</strong> {{ r.klasa }}</p>
+                <p><strong>👨‍🏫 Wychowawca:</strong> {{ r.wychowawca }}</p>
+                <p><strong>📚 Przedmioty, Nauczyciele i Oceny:</strong></p>
+                <ul style="background: #f8fafc; padding: 15px; border-radius: 8px; list-style: none;">
+                    {% for przedmiot in r.przedmioty.split(';') %}
+                        <li>🔹 {{ przedmiot.strip() }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div style="text-align: center; padding: 40px;">
+                <p>Brak danych w bazie dla podanego zapytania.</p>
+            </div>
+        {% endif %}
+        <button onclick="window.close()" style="background: #64748b; margin-top: 20px;">Zamknij tę kartę</button>
+    </div>
+</body>
+</html>

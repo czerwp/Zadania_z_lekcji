@@ -1,0 +1,76 @@
+:root {
+    --primary: #2563eb;
+    --bg: #f8fafc;
+    --card: #ffffff;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg);
+    margin: 0; padding: 20px;
+}
+
+.header {
+    display: flex; align-items: center; gap: 20px;
+    background: white; padding: 20px; border-radius: 15px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+.logo {
+    width: 60px; height: 60px;
+    background: linear-gradient(45deg, var(--primary), #3b82f6);
+    border-radius: 12px; display: flex; align-items: center;
+    justify-content: center; color: white; font-weight: bold;
+}
+
+.weather-bar {
+    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+    color: #0369a1;
+    padding: 30px;
+    border-radius: 20px;
+    margin: 25px 0;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+}
+
+.weather-icon {
+    font-size: 50px;
+}
+
+.weather-info h2 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.weather-info p {
+    margin: 5px 0 0 0;
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+.grid-forms {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;
+}
+
+.form-card {
+    background: var(--card); padding: 25px; border-radius: 15px;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+}
+
+input, button {
+    width: 100%; padding: 12px; margin-top: 10px;
+    border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box;
+}
+
+button {
+    background: var(--primary); color: white; border: none;
+    cursor: pointer; transition: 0.3s; font-weight: bold;
+}
+
+button:hover { background: #1d4ed8; }
+
+.add-btn { background: #10b981; }

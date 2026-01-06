@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Dodaj Ucznia</title>
+    <style>
+        .przedmiot-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 0.5fr;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-card" style="max-width: 700px; margin: 50px auto;">
+        <h2>Dodaj nowego ucznia</h2>
+        <form method="POST" id="studentForm">
+            <!-- Dane podstawowe -->
+            <input type="text" name="uczen" placeholder="Imię i Nazwisko ucznia" required>
+            <input type="text" name="klasa" placeholder="Klasa" required>
+            <input type="text" name="wychowawca" placeholder="Imię i Nazwisko wychowawcy" required>
+
+            <hr>
+            <h4>Przedmioty i Oceny</h4>
+            <div id="przedmioty-container">
+                <div class="przedmiot-row">
+                    <input type="text" name="nazwa_przedmiotu[]" placeholder="Przedmiot" required>
+                    <input type="text" name="nauczyciel_przedmiotu[]" placeholder="Nauczyciel" required>
+                    <input type="text" name="ocena[]" placeholder="Ocena" required>
+                </div>
+            </div>
+
+            <button type="button" onclick="dodajWiersz()" style="background: #3b82f6; margin-bottom: 20px;">
+                + Dodaj kolejny przedmiot
+            </button>
+
+            <button type="submit" class="add-btn">Zapisz ucznia w bazie danych</button>
+        </form>
+        <button onclick="location.href='/'" style="background: gray; margin-top: 10px;">Powrót</button>
+    </div>
+
+    <script>
+        function dodajWiersz() {
+            const container = document.getElementById('przedmioty-container');
+            const nowyWiersz = document.createElement('div');
+            nowyWiersz.className = 'przedmiot-row';
+            nowyWiersz.innerHTML = `
+                <input type="text" name="nazwa_przedmiotu[]" placeholder="Przedmiot" required>
+                <input type="text" name="nauczyciel_przedmiotu[]" placeholder="Nauczyciel" required>
+                <input type="text" name="ocena[]" placeholder="Ocena" required>
+            `;
+            container.appendChild(nowyWiersz);
+        }
+    </script>
+</body>
+</html>
