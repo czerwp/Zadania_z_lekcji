@@ -30,10 +30,13 @@
             <h2>Saldo: {{ "%.2f"|format(saldo) }} zł</h2>
             <h3>Stan Magazynu:</h3>
             <ul>
-                {% for produkt, dane in magazyn.items() %}
-                <li><strong>{{ produkt }}</strong>: {{ dane.ilosc }} szt. (Cena: {{ dane.cena }} zł)</li>
-                {% endfor %}
-            </ul>
+    {% for produkt in magazyn %}
+    <li>
+        <strong>{{ produkt.nazwa }}</strong>:
+        {{ produkt.ilosc }} szt. (Cena: {{ produkt.cena }} zł)
+    </li>
+    {% endfor %}
+</ul>
         </section>
 
         <div class="forms-grid">
@@ -61,7 +64,7 @@
             <div class="card">
                 <h3>Zmiana Salda</h3>
                 <form action="/saldo" method="post">
-                    <input type="number" step="0.01" name="wartosc" placeholder="Wartość zmiany" required>
+                    <input type="number" step="0.01" name="kwota" placeholder="Wartość zmiany" required>
                     <button type="submit" class="btn-balance">Zmień</button>
                 </form>
                 <div class="history-section">

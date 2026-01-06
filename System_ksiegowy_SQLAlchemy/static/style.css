@@ -14,7 +14,7 @@ button { width: 100%; padding: 10px; border: none; background: #27ae60; color: w
 .history-table { width: 100%; border-collapse: collapse; background: white;}
 .history-table th, .history-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
 .history-table th { background: #f8f9fa; }
-
+.btn-secondary { color: #FFFFFF; }
 .history-section {
     margin-top: 20px;
     width: 100%;

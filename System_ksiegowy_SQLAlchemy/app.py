@@ -1,51 +1,65 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+
 import os
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 app = Flask(__name__)
-app.secret_key = "projekt_magazyn_secret"
+app.secret_key = "super_tajny_klucz_firmy"
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'firma.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 
-class Manager:
-    def __init__(self, plik_danych):
-        self.plik_danych = plik_danych
-        self.saldo = 0.0
-        self.magazyn = {}
-        self.historia = []
-        self.wczytaj_z_pliku()
 
-    def wczytaj_z_pliku(self):
-        if not os.path.exists(self.plik_danych):
-            return
-        with open(self.plik_danych, "r", encoding="utf-8") as f:
-            for linia in f:
-                dane = linia.strip().split("|")
-                if not dane or not dane[0]: continue
-                if dane[0] == "SALDO":
-                    self.saldo = float(dane[1])
-                elif dane[0] == "MAGAZYN":
-                    self.magazyn[dane[1]] = {"cena": float(dane[2]), "ilosc": int(dane[3])}
-                elif dane[0] == "HISTORIA":
-                    self.historia.append("|".join(dane[1:]))
-
-    def zapisz_do_pliku(self):
-        with open(self.plik_danych, "w", encoding="utf-8") as f:
-            f.write(f"SALDO|{self.saldo}\n")
-            for nazwa, d in self.magazyn.items():
-                f.write(f"MAGAZYN|{nazwa}|{d['cena']}|{d['ilosc']}\n")
-            for wpis in self.historia:
-                f.write(f"HISTORIA|{wpis}\n")
-
-    def dodaj_do_historii(self, akcja):
-        self.historia.append(akcja)
-        self.zapisz_do_pliku()
+class Saldo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    wartosc = db.Column(db.Float, nullable=False, default=0.0)
 
 
-manager = Manager("data.txt")
+class Magazyn(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nazwa = db.Column(db.String(100), unique=True, nullable=False)
+    cena = db.Column(db.Float, nullable=False)
+    ilosc = db.Column(db.Integer, nullable=False)
+
+
+class Historia(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    wpis = db.Column(db.String(500), nullable=False)
+    kwota_zmiany = db.Column(db.Float, default=0.0)  # Pomocne do skryptu sprawdzającego
+
+
+
+def pobierz_lub_stworz_saldo():
+    s = Saldo.query.first()
+    if not s:
+        s = Saldo(wartosc=0.0)
+        db.session.add(s)
+        db.session.commit()
+    return s
+
+
+def sprawdz_spojnosc_danych():
+    wszystkie_wpisy = Historia.query.all()
+    suma_historii = sum(h.kwota_zmiany for h in wszystkie_wpisy)
+    aktualne_saldo = pobierz_lub_stworz_saldo().wartosc
+    return round(suma_historii, 2) == round(aktualne_saldo, 2)
 
 
 @app.route('/')
 def index():
-    return render_template('index.html', saldo=manager.saldo, magazyn=manager.magazyn)
+    saldo_obj = pobierz_lub_stworz_saldo()
+    produkty = Magazyn.query.all()
+    spojne = sprawdz_spojnosc_danych()
+    return render_template('index.html',
+                           saldo=saldo_obj.wartosc,
+                           magazyn=produkty,
+                           db_status=spojne)
 
 
 @app.route('/zakup', methods=['POST'])
@@ -56,19 +70,30 @@ def zakup():
         ilosc = int(request.form.get('ilosc'))
         koszt = cena * ilosc
 
-        if manager.saldo >= koszt:
-            manager.saldo -= koszt
-            if nazwa in manager.magazyn:
-                manager.magazyn[nazwa]['ilosc'] += ilosc
-                manager.magazyn[nazwa]['cena'] = cena
+        saldo_obj = pobierz_lub_stworz_saldo()
+
+        if saldo_obj.wartosc >= koszt:
+            produkt = Magazyn.query.filter_by(nazwa=nazwa).first()
+
+            # TRANSAKCJA START
+            saldo_obj.wartosc -= koszt
+            if produkt:
+                produkt.ilosc += ilosc
+                produkt.cena = cena  # Aktualizacja do najnowszej ceny
             else:
-                manager.magazyn[nazwa] = {"cena": cena, "ilosc": ilosc}
-            manager.dodaj_do_historii(f"ZAKUP: {nazwa} | {ilosc} szt. | Cena: {cena}")
-            flash(f"Zakupiono {nazwa} ({ilosc} szt.)", "success")
+                db.session.add(Magazyn(nazwa=nazwa, cena=cena, ilosc=ilosc))
+
+            db.session.add(Historia(wpis=f"ZAKUP: {nazwa}, {ilosc} szt. za {koszt} zł", kwota_zmiany=-koszt))
+
+            db.session.commit()
+            flash(f"Pomyślnie zakupiono {ilosc}x {nazwa}", "success")
         else:
-            flash("Błąd: Niewystarczające saldo!", "error")
-    except ValueError:
-        flash("Błąd: Nieprawidłowe dane zakupu.", "error")
+            flash("Błąd: Niewystarczające środki na koncie!", "error")
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Wystąpił błąd podczas zakupu: {str(e)}", "error")
+
     return redirect(url_for('index'))
 
 
@@ -78,49 +103,75 @@ def sprzedaz():
         nazwa = request.form.get('nazwa').strip().capitalize()
         ilosc = int(request.form.get('ilosc'))
 
-        if nazwa in manager.magazyn and manager.magazyn[nazwa]['ilosc'] >= ilosc:
-            cena = manager.magazyn[nazwa]['cena']
-            manager.magazyn[nazwa]['ilosc'] -= ilosc
-            manager.saldo += cena * ilosc
-            manager.dodaj_do_historii(f"SPRZEDAŻ: {nazwa} | {ilosc} szt. | Cena: {cena}")
-            flash(f"Sprzedano {nazwa} ({ilosc} szt.)", "success")
-        else:
-            flash("Błąd: Brak towaru w magazynie lub niewystarczająca ilość.", "error")
-    except ValueError:
-        flash("Błąd: Nieprawidłowe dane sprzedaży.", "error")
-    return redirect(url_for('index'))
+        produkt = Magazyn.query.filter_by(nazwa=nazwa).first()
+        saldo_obj = pobierz_lub_stworz_saldo()
 
+        if produkt and produkt.ilosc >= ilosc:
+            zysk = produkt.cena * ilosc
 
-@app.route('/saldo', methods=['POST'])
-def zmiana_saldo():
-    try:
-        wartosc = float(request.form.get('wartosc'))
-        if manager.saldo + wartosc < 0:
-            flash("Błąd: Saldo nie może być ujemne!", "error")
+            produkt.ilosc -= ilosc
+            saldo_obj.wartosc += zysk
+
+            db.session.add(Historia(wpis=f"SPRZEDAŻ: {nazwa}, {ilosc} szt. za {zysk} zł", kwota_zmiany=zysk))
+
+            db.session.commit()
+            flash(f"Pomyślnie sprzedano {ilosc}x {nazwa}", "success")
         else:
-            manager.saldo += wartosc
-            manager.dodaj_do_historii(f"SALDO: Zmiana o {wartosc} zł")
-            flash("Zaktualizowano saldo.", "success")
-    except ValueError:
-        flash("Błąd: Nieprawidłowa wartość salda.", "error")
+            flash("Błąd: Brak towaru w magazynie lub niewystarczająca ilość!", "error")
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Wystąpił błąd podczas sprzedaży: {str(e)}", "error")
+
     return redirect(url_for('index'))
 
 
 @app.route('/historia/')
 @app.route('/historia/<int:start>/<int:koniec>/')
 def historia(start=None, koniec=None):
-    logi = manager.historia
-    max_len = len(logi)
+    f_start = request.args.get('f_start')
+    f_koniec = request.args.get('f_koniec')
 
-    if start is None or koniec is None:
-        return render_template('historia.html', historia=logi, start=1, max_len=max_len)
+    if f_start is not None and f_koniec is not None:
+        return redirect(url_for('historia', start=f_start, koniec=f_koniec))
 
-    if start < 1 or koniec > max_len or start > koniec:
-        komunikat = f"Błąd: Nieprawidłowy zakres! Dostępny zakres historii to 1 - {max_len}."
-        return render_template('historia.html', historia=[], error=komunikat, max_len=max_len)
+    wszystkie_wpisy = Historia.query.all()
+    max_len = len(wszystkie_wpisy)
 
-    wycinek = logi[start - 1:koniec]
-    return render_template('historia.html', historia=wycinek, start=start, max_len=max_len)
+    if start is not None and koniec is not None:
+        idx_start = max(0, start - 1)
+        idx_koniec = min(max_len, koniec)
+        wybrane_wpisy = wszystkie_wpisy[idx_start:idx_koniec]
+        display_start = start
+    else:
+        wybrane_wpisy = wszystkie_wpisy
+        display_start = 1
+
+    return render_template('historia.html',
+                           historia=wybrane_wpisy,
+                           start=display_start,
+                           max_len=max_len)
+
+@app.route('/saldo', methods=['POST'])
+def saldo():
+    try:
+        kwota = float(request.form.get('kwota'))
+        saldo_obj = pobierz_lub_stworz_saldo()
+
+        if saldo_obj.wartosc + kwota < 0:
+            flash("Błąd: Nie można wypłacić kwoty większej niż stan konta!", "error")
+        else:
+            saldo_obj.wartosc += kwota
+            typ = "WPŁATA" if kwota > 0 else "WYPŁATA"
+            db.session.add(Historia(wpis=f"{typ}: Zmiana salda o {kwota} zł", kwota_zmiany=kwota))
+            db.session.commit()
+            flash(f"Pomyślnie wykonano operację: {typ}", "success")
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Błąd zmiany salda: {str(e)}", "error")
+
+    return redirect(url_for('index'))
 
 
 if __name__ == '__main__':
