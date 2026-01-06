@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Historia - Magazyn</title>
+</head>
+<body>
+    <header>
+        <h1>Historia Operacji</h1>
+        <nav><a href="/">Powrót</a></nav>
+    </header>
+
+    <div class="container">
+        {% if error %}
+            <div class="alert error">{{ error }}</div>
+        {% endif %}
+
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>Lp.</th>
+                    <th>Szczegóły operacji</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for wpis in historia %}
+                <tr>
+                    <td>{{ loop.index + (start - 1 if start else 0) }}</td>
+                    <td>{{ wpis }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

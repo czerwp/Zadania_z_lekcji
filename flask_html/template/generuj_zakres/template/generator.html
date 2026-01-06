@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+
+    {% block content %}
+    <h3>Tutaj wygenerujesz swoją liczbę losową</h3>
+
+    <form method="post">
+        <label>Początkowa liczba z zakresu: <input name="start-num"></label>
+        <label>końcowa liczba z zakresu: <input name="stop-num"></label>
+        <button type="submit">Wyślij</button>
+    </form>
+
+
+    {% endblock %}
