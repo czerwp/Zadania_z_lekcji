@@ -80,8 +80,8 @@ class WeatherForecast:
             yield (date, value)
 
 if __name__ == "__main__":
-    latitude = 52.23
-    longitude = 21.01
+    latitude = 52.17
+    longitude = 16.44
 
     wf = WeatherForecast(latitude, longitude)
 
