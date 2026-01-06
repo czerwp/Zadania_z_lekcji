@@ -1,0 +1,180 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+    color: #222222;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+/* NAGŁÓWEK */
+header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 1rem 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.header-content {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+header h1 { margin: 0; font-size: 1.5rem; }
+
+.btn-secondary, .btn-clear {
+    color: white;
+    text-decoration: none;
+    border: 1px solid white;
+    padding: 8px 15px;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+.btn-secondary:hover { background: white; color: #2c3e50; }
+
+.btn-filter {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-filter:hover { background-color: #2980b9; }
+
+.filter-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.input-group input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.info-bar {
+    background: #e9ecef;
+    padding: 10px 20px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    border-left: 5px solid #3498db;
+}
+
+.info-bar p {
+    margin: 0;
+    color: #2c3e50;
+    font-weight: bold;
+}
+
+.table-container {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+}
+
+.history-table th {
+    background-color: #f8f9fa;
+    color: #333333;
+    text-align: left;
+    padding: 15px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.history-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    color: #000000 !important;
+}
+
+.row-num {
+    font-weight: bold;
+    color: #7f8c8d;
+    background-color: #fafafa;
+}
+
+.row-content {
+    font-family: monospace;
+    font-size: 0.95rem;
+}
+
+.history-table tr:hover {
+    background-color: #f1f4f6;
+}
+
+.no-data {
+    padding: 40px;
+    text-align: center;
+    color: #e74c3c;
+    font-weight: bold;
+}
+.navigation-card {
+    margin-bottom: 30px;
+}
+
+.center {
+    text-align: left;
+}
+
+.btn-history {
+    display: inline-block;
+    background-color: #2c3e50;
+    color: white;
+    padding: 12px 25px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+    border: 1px solid #1a252f;
+}
+
+.btn-history:hover {
+    background-color: #34495e;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.card h3 {
+    margin-top: 0;
+    color: #2c3e50;
+}

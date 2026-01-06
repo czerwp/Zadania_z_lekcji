@@ -7,10 +7,18 @@
 <body>
     <header>
         <h1>Zarządzanie Magazynem</h1>
-        <nav><a href="/historia/">Zobacz Historię</a></nav>
     </header>
-
+    {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert {{ category }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
     <main>
+
         <section class="status">
             <h2>Aktualne Saldo: <span class="money">{{ saldo }} zł</span></h2>
             <h3>Stan Magazynu:</h3>
@@ -50,6 +58,14 @@
                     <button type="submit" class="btn-saldo">Zmień saldo</button>
                 </form>
             </div>
+            <br><br><hr>
+            <section class="navigation-card">
+    <div class="card center">
+        <h3>Archiwum operacji</h3>
+        <p>Kliknij poniżej, aby przejrzeć pełny dziennik zdarzeń, zakupów i sprzedaży.</p>
+        <a href="/historia/" class="btn-history">Pokaż historię</a>
+    </div>
+        </section>
         </section>
     </main>
 </body>
